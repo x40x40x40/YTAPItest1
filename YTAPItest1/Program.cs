@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Nancy.Json;
 
 namespace HttpClientSample
 {
@@ -12,6 +13,14 @@ namespace HttpClientSample
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Category { get; set; }
+
+        public string item { get; set; }
+    }
+
+    public class VideoInfo
+    {
+        public string videoId { get; set; }
+        
     }
 
     class Program
@@ -20,7 +29,7 @@ namespace HttpClientSample
 
         static void ShowProduct(Product product)
         {
-            Console.WriteLine($"Name: {product.Name}\tPrice: " +
+            Console.WriteLine($"Name: {product.item}\tPrice: " +
                 $"{product.Price}\tCategory: {product.Category}");
         }
 
@@ -37,10 +46,16 @@ namespace HttpClientSample
         static async Task<Product> GetProductAsync(string path)
         {
             Product product = null;
-            HttpResponseMessage response = await client.GetAsync(path);
+            HttpResponseMessage response = await client.GetAsync("youtube/v3/search?part=snippet&channelId=UCPXBKQxddbDqwr5G8kTaKVg&maxResults=1&order=date&key=AIzaSyB9DJyO6YCKnmllKkYLuykCMbSqTkwRK-A&type=video");
             if (response.IsSuccessStatusCode)
             {
-                product = await response.Content.ReadAsAsync<Product>();
+                //product = await response.Content.ReadAsAsync<Product>();
+
+                string data = await response.Content.ReadAsStringAsync();
+                //use JavaScriptSerializer from System.Web.Script.Serialization
+                JavaScriptSerializer JSserializer = new JavaScriptSerializer();
+                //deserialize to your class
+                product = JSserializer.Deserialize<Product>(data);
             }
             return product;
         }
@@ -71,7 +86,7 @@ namespace HttpClientSample
         static async Task RunAsync()
         {
             // Update port # in the following line.
-            client.BaseAddress = new Uri("http://localhost:64195/");
+            client.BaseAddress = new Uri("https://www.googleapis.com/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -79,21 +94,21 @@ namespace HttpClientSample
             try
             {
                 // Create a new product
-                Product product = new Product
-                {
-                    Name = "Gizmo",
-                    Price = 100,
-                    Category = "Widgets"
-                };
+                Product product = new Product();
 
-                var url = await CreateProductAsync(product);
+              /*  VideoInfo vI = new VideoInfo()
+                {
+                    videoId = "g";
+                }; */
+
+                var url = new Uri("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCPXBKQxddbDqwr5G8kTaKVg&maxResults=1&order=date&key=AIzaSyB9DJyO6YCKnmllKkYLuykCMbSqTkwRK-A&type=video");
                 Console.WriteLine($"Created at {url}");
 
                 // Get the product
                 product = await GetProductAsync(url.PathAndQuery);
                 ShowProduct(product);
 
-                // Update the product
+               /* // Update the product
                 Console.WriteLine("Updating price...");
                 product.Price = 80;
                 await UpdateProductAsync(product);
@@ -104,7 +119,7 @@ namespace HttpClientSample
 
                 // Delete the product
                 var statusCode = await DeleteProductAsync(product.Id);
-                Console.WriteLine($"Deleted (HTTP Status = {(int)statusCode})");
+                Console.WriteLine($"Deleted (HTTP Status = {(int)statusCode})"); */
 
             }
             catch (Exception e)
