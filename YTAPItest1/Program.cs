@@ -14,7 +14,7 @@ using Google.Apis.YouTube.v3.Data;
 namespace Google.Apis.YouTube.Samples
 {
     /// <summary>
-    /// YouTube Data API v3 sample: retrieve my uploads.
+    /// YouTube Data API v3 sample: retrieve my uploads. +
     /// Relies on the Google APIs Client Library for .NET, v1.7.0 or higher.
     /// See https://developers.google.com/api-client-library/dotnet/get_started
     /// </summary>
@@ -23,7 +23,7 @@ namespace Google.Apis.YouTube.Samples
         [STAThread]
         static void Main(string[] args)
         {
-            Console.WriteLine("YouTube Data API: My Uploads");
+            Console.WriteLine("YouTube ++ Data API: My Uploads");
             Console.WriteLine("============================");
 
             try
