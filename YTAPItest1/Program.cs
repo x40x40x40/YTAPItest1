@@ -44,11 +44,11 @@ namespace HttpClientSample
 
     public class MyResp
     {
-        public Items items { get; set; }
+        public IList<Items> items { get; set; }
 
         public MyResp()
         {
-            items = new Items();
+            
         }
 
     }
@@ -59,7 +59,7 @@ namespace HttpClientSample
 
         static void ShowProduct(MyResp myresp)
         {
-            Console.WriteLine($"Name: {myresp.items.id.videoId} ");
+            Console.WriteLine($"Name: {myresp.items[0].id.videoId} ");
         }
 
         static async Task<Uri> CreateProductAsync(Product product)
