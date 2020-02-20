@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Nancy.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HttpClientSample
 {
@@ -17,20 +19,47 @@ namespace HttpClientSample
         public string item { get; set; }
     }
 
-    public class VideoInfo
+
+    public class Id
     {
         public string videoId { get; set; }
+
+        public  Id()
+        {
+            videoId = "hi";
+        }
         
+    }
+
+    public class Items
+    {
+        public Id id { get; set; }
+
+        public Items()
+        {
+            id = new Id();
+        }
+
+    }
+
+    public class MyResp
+    {
+        public Items items { get; set; }
+
+        public MyResp()
+        {
+            items = new Items();
+        }
+
     }
 
     class Program
     {
         static HttpClient client = new HttpClient();
 
-        static void ShowProduct(Product product)
+        static void ShowProduct(MyResp myresp)
         {
-            Console.WriteLine($"Name: {product.item}\tPrice: " +
-                $"{product.Price}\tCategory: {product.Category}");
+            Console.WriteLine($"Name: {myresp.items.id.videoId} ");
         }
 
         static async Task<Uri> CreateProductAsync(Product product)
@@ -43,21 +72,39 @@ namespace HttpClientSample
             return response.Headers.Location;
         }
 
-        static async Task<Product> GetProductAsync(string path)
+        static async Task<MyResp> GetProductAsync(string path)
         {
-            Product product = null;
+            MyResp myresp = new MyResp();
             HttpResponseMessage response = await client.GetAsync("youtube/v3/search?part=snippet&channelId=UCPXBKQxddbDqwr5G8kTaKVg&maxResults=1&order=date&key=AIzaSyB9DJyO6YCKnmllKkYLuykCMbSqTkwRK-A&type=video");
             if (response.IsSuccessStatusCode)
             {
+                //string temp = response.Content.ToString();
+                //Console.Write(temp);
+
+                //JObject search = JObject.Parse(temp);
+
+                //JToken results = search["regionCode"];
+
+
+
+
+
+
+
+                //items = results.ToObject<Product>();
+                myresp = await response.Content.ReadAsAsync<MyResp>();
+
+
+
                 //product = await response.Content.ReadAsAsync<Product>();
 
-                string data = await response.Content.ReadAsStringAsync();
+                //string data = await response.Content.ReadAsStringAsync();
                 //use JavaScriptSerializer from System.Web.Script.Serialization
-                JavaScriptSerializer JSserializer = new JavaScriptSerializer();
+                //JavaScriptSerializer JSserializer = new JavaScriptSerializer();
                 //deserialize to your class
-                product = JSserializer.Deserialize<Product>(data);
+                //product = JSserializer.Deserialize<Product>(data);
             }
-            return product;
+            return myresp;
         }
 
         static async Task<Product> UpdateProductAsync(Product product)
@@ -94,7 +141,7 @@ namespace HttpClientSample
             try
             {
                 // Create a new product
-                Product product = new Product();
+                MyResp myresp = new MyResp();
 
               /*  VideoInfo vI = new VideoInfo()
                 {
@@ -105,8 +152,8 @@ namespace HttpClientSample
                 Console.WriteLine($"Created at {url}");
 
                 // Get the product
-                product = await GetProductAsync(url.PathAndQuery);
-                ShowProduct(product);
+                myresp = await GetProductAsync(url.PathAndQuery);
+                ShowProduct(myresp);
 
                /* // Update the product
                 Console.WriteLine("Updating price...");
